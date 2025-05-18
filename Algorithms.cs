@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
-
 namespace Recorder
 {
     class Algorithms
@@ -30,8 +29,10 @@ namespace Recorder
 
         public string identify(Sequence A) // Ibrahim & Zamel
         {
-
-            return "LOL";
+            String ans = null;
+            double mn = double.MaxValue;
+            // loop over dataset and minimize the distance
+            return ans;
         }
 
     }
