@@ -13,7 +13,7 @@ namespace Recorder
     {
         // get the elidean distance between two frames
         // each frame has 13 coefficients (features).
-        public double getuEuclideanDistance(double[] frameA, double[] frameB)
+        private double getuEuclideanDistance(double[] frameA, double[] frameB)
         {
             double res = 0;
             for (int i = 0; i < 13; i++)
@@ -46,7 +46,9 @@ namespace Recorder
                 for (int j = 1; j <= m; j++)
                 {
                     double cost = getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 1].Features);
-                    dtw[i, j] = cost + Math.Min(dtw[i - 1, j], Math.Min(dtw[i, j - 1], dtw[i - 1, j - 1]));
+                    dtw[i, j] = cost + Math.Min(dtw[i - 1, j - 1], dtw[i - 1, j - 1]);
+                    if(j > 1)
+                        dtw[i, j] = Math.Min(dtw[i, j], dtw[i - 1, j - 2] + cost);
                 }
             }
 
