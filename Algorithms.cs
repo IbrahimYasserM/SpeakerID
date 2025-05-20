@@ -69,26 +69,45 @@ namespace Recorder
         public static double dynamicTimeWarpingWithPruning(Sequence A, Sequence B, int W) // Ebrahim & Adham
         {
 
-            // This is the basic DTW algorithm , based on the formula sent on discord, this still doesn't include pruning
-
+           // Each sequence is a list of frames.
+            // we want to compute min distance between the two sequences USING DP.
+            //Transtions:
+            // 1. Next input frame aligns to same template frame (stretching).
+            // 2. Next input frame aligns to next template frame (no warping).
+            // 3. Next input frame skips one template frame (shrinking, at most 1/2).
             int n = A.Frames.Length;
             int m = B.Frames.Length;
 
+            // Calculate maximum allowed difference between i and j
             double[,] dtw = new double[n + 1, m + 1];
 
+            // Initialize all values to infinity
             for (int i = 0; i <= n; i++)
                 for (int j = 0; j <= m; j++)
                     dtw[i, j] = double.PositiveInfinity;
 
+            // Base case
             dtw[0, 0] = 0;
+            
 
             for (int i = 1; i <= n; i++)
             {
-                for (int j = 1; j <= m; j++)
+                int window = Math.Min(W, Math.Max(n, m));
+                int start = Math.Max(1, i - window);
+                int end = Math.Min(m, i + window);
+
+                for (int j = start; j <= end; j++)
                 {
-                    if (Math.Abs(i - j) > W) break;
                     double cost = getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 1].Features);
-                    dtw[i, j] = cost + Math.Min(dtw[i - 1, j], Math.Min(dtw[i, j - 1], dtw[i - 1, j - 1]));
+                    double prev = dtw[i - 1, j - 1]; // No warping
+                    prev = Math.Min(prev, dtw[i - 1, j]); // Stretching
+                    if(j>= 2)
+                        prev = Math.Min(prev, dtw[i - 1, j - 2]); // Shrinking
+
+                    if (Math.Abs(i - j) > window)
+                        continue;
+
+                    dtw[i, j] = cost + prev;
                 }
             }
 
