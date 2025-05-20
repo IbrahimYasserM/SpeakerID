@@ -224,17 +224,14 @@ C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\Recorder.exe
 C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\Recorder.pdb
 C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\AForge.dll
 C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\AForge.Math.dll
-C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\MWArray.dll
 C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\SharpDX.DirectSound.dll
 C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\SharpDX.dll
 C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\AForge.xml
 C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\AForge.Math.xml
-C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\MWArray.xml
 C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\NAudio.xml
 C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\SharpDX.xml
 C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\SharpDX.DirectSound.xml
 C:\Users\omarz\Documents\GitHub\SpeakerID\obj\x86\Debug\Recorder.csproj.AssemblyReference.cache
-C:\Users\omarz\Documents\GitHub\SpeakerID\obj\x86\Debug\Recorder.exe.config
 C:\Users\omarz\Documents\GitHub\SpeakerID\obj\x86\Debug\Recorder.MainForm.resources
 C:\Users\omarz\Documents\GitHub\SpeakerID\obj\x86\Debug\Recorder.Properties.Resources.resources
 C:\Users\omarz\Documents\GitHub\SpeakerID\obj\x86\Debug\Recorder.csproj.GenerateResource.cache
@@ -242,3 +239,5 @@ C:\Users\omarz\Documents\GitHub\SpeakerID\obj\x86\Debug\Recorder.csproj.CoreComp
 C:\Users\omarz\Documents\GitHub\SpeakerID\obj\x86\Debug\Recorder.csproj.Up2Date
 C:\Users\omarz\Documents\GitHub\SpeakerID\obj\x86\Debug\Recorder.exe
 C:\Users\omarz\Documents\GitHub\SpeakerID\obj\x86\Debug\Recorder.pdb
+C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\MWArray.dll
+C:\Users\omarz\Documents\GitHub\SpeakerID\bin\Debug\MWArray.xml

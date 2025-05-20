@@ -17,7 +17,7 @@ namespace Recorder
         public static double getuEuclideanDistance(double[] frameA, double[] frameB)
         {
             double res = 0;
-            for (int i = 0; i < frameA.Length; i++)
+            for (int i = 0; i < 13; i++)
             {
                 res += (frameA[i] - frameB[i]) * (frameA[i] - frameB[i]);
             }
@@ -25,7 +25,7 @@ namespace Recorder
             return res;
         }
 
-        public static  double dynamicTimeWarping(Sequence A, Sequence B) // Ibrahim & Zamel
+        public static double dynamicTimeWarping(Sequence A, Sequence B)
         {
             // Each sequence is a list of frames.
             // we want to compute min distance between the two sequences USING DP.
@@ -36,34 +36,36 @@ namespace Recorder
             int n = A.Frames.Length;
             int m = B.Frames.Length;
 
-            // Calculate maximum allowed difference between i and j
-            double[,] dtw = new double[n + 1, m + 1];
+            double[] prevRow = new double[m + 1];
+            double[] currRow = new double[m + 1];
 
-            // Initialize all values to infinity
-            for (int i = 0; i <= n; i++)
-                for (int j = 0; j <= m; j++)
-                    dtw[i, j] = double.PositiveInfinity;
-
-            // Base case
-            dtw[0, 0] = 0;
-            
+            for (int j = 0; j <= m; j++)
+                prevRow[j] = double.PositiveInfinity;
+            prevRow[0] = 0;
 
             for (int i = 1; i <= n; i++)
             {
+                for (int j = 0; j <= m; j++)
+                    currRow[j] = double.PositiveInfinity;
+                var aFeatures = A.Frames[i - 1].Features;
                 for (int j = 1; j <= m; j++)
                 {
-                    double cost = getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 1].Features);
-                    double prev = dtw[i - 1, j - 1]; // No warping
-                    prev = Math.Min(prev, dtw[i - 1, j]); // Stretching
-                    if(j>= 2)
-                        prev = Math.Min(prev, dtw[i - 1, j - 2]); // Shrinking
-
-
-                    dtw[i, j] = cost + prev;
+                    double cost = getuEuclideanDistance(aFeatures, B.Frames[j - 1].Features);
+                    double minPrev = Math.Min(
+                        prevRow[j - 1], // No warping
+                        Math.Min(
+                            prevRow[j], // Stretching
+                            (j >= 2) ? prevRow[j - 2] : double.PositiveInfinity // Shrinking
+                        )
+                    );
+                    currRow[j] = cost + minPrev;
                 }
+                // Swap rows for next iteration
+                    double[] temp = prevRow;
+                    prevRow = currRow;
+                    currRow = temp;
             }
-
-            return dtw[n, m];
+            return prevRow[m];
         }
 
         public static double dynamicTimeWarpingWithPruning(Sequence A, Sequence B, int W) // Ebrahim & Adham
@@ -88,17 +90,15 @@ namespace Recorder
 
             // Base case
             dtw[0, 0] = 0;
-            
-
+            int window = Math.Max(W, 2 * Math.Abs(n-m));
             for (int i = 1; i <= n; i++)
             {
-                int window = Math.Min(W, Math.Max(n, m));
                 int start = Math.Max(1, i - window);
                 int end = Math.Min(m, i + window);
-
+                double[] aFeatures = A.Frames[i - 1].Features;
                 for (int j = start; j <= end; j++)
                 {
-                    double cost = getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 1].Features);
+                    double cost = getuEuclideanDistance(aFeatures, B.Frames[j - 1].Features);
                     double prev = dtw[i - 1, j - 1]; // No warping
                     prev = Math.Min(prev, dtw[i - 1, j]); // Stretching
                     if(j>= 2)

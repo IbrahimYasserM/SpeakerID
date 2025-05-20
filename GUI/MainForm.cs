@@ -315,8 +315,8 @@ namespace Recorder
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
             fileDialog.ShowDialog();
-
             var hobba = TestcaseLoader.LoadTestcase2Training(fileDialog.FileName);
+
         }
 
 
