@@ -36,11 +36,34 @@ namespace Recorder
             return -1.0;
         }
 
-        public double dynamicTimeWarpingWithPruning(Sequence A, Sequence B) // Ebrahim & Adham
+        public double dynamicTimeWarpingWithPruning(Sequence A, Sequence B, int W) // Ebrahim & Adham
         {
 
-            return -1.0;
+            // This is the basic DTW algorithm , based on the formula sent on discord, this still doesn't include pruning
+
+            int n = A.Frames.Length;
+            int m = B.Frames.Length;
+
+            double[,] dtw = new double[n + 1, m + 1];
+
+            for (int i = 0; i <= n; i++)
+                for (int j = 0; j <= m; j++)
+                    dtw[i, j] = double.PositiveInfinity;
+
+            dtw[0, 0] = 0;
+
+            for (int i = 1; i <= n; i++)
+            {
+                for (int j = 1; j <= m; j++)
+                {
+                    double cost = getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 1].Features);
+                    dtw[i, j] = cost + Math.Min(dtw[i - 1, j], Math.Min(dtw[i, j - 1], dtw[i - 1, j - 1]));
+                }
+            }
+
+            return dtw[n, m];
         }
+
 
         public void enroll() // Ebrahim & Adham
         {
