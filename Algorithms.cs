@@ -73,6 +73,7 @@ namespace Recorder
             {
                 for (int j = 1; j <= m; j++)
                 {
+                    if (Math.Abs(i - j) > W) break;
                     double cost = getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 1].Features);
                     dtw[i, j] = cost + Math.Min(dtw[i - 1, j], Math.Min(dtw[i, j - 1], dtw[i - 1, j - 1]));
                 }
