@@ -12,8 +12,7 @@ namespace Recorder
 {
     static class Algorithms
     {
-        // get the elidean distance between two frames
-        // each frame has 13 coefficients (features).
+  
         private static double getuEuclideanDistance(double[] frameA, double[] frameB)
         {
             double res = 0;
@@ -30,39 +29,41 @@ namespace Recorder
             int n = A.Frames.Length;
             int m = B.Frames.Length;
 
-            double[] dp = new double[m + 1];
+            double[] prevRow = new double[m + 1];
+            double[] currRow = new double[m + 1];
 
-            for (int j = 1; j <= m; j++)
-                dp[j] = double.PositiveInfinity;
-            dp[0] = 0;
+            for (int j = 0; j <= m; j++)
+                prevRow[j] = double.PositiveInfinity;
+            prevRow[0] = 0;
 
             for (int i = 1; i <= n; i++)
             {
-                for (int j = m; j > 1; --j)
+                for (int j = 0; j <= m; j++)
+                    currRow[j] = double.PositiveInfinity;
+                var aFeatures = A.Frames[i - 1].Features;
+                for (int j = 1; j <= m; j++)
                 {
-                    double res = 0;
-                    for (int k = 0; k < 13; ++k)
-                        res += (A.Frames[i - 1].Features[k] - B.Frames[j - 1].Features[k]) * (A.Frames[i - 1].Features[k] - B.Frames[j - 1].Features[k]);
-                    res = Math.Sqrt(res);
-                    dp[j] = Math.Min(
-                        Math.Min(dp[j], dp[j - 1]),
-                        dp[j - 2]
-                    ) + res;
+                    double cost = getuEuclideanDistance(aFeatures, B.Frames[j - 1].Features);
+                    double minPrev = Math.Min(
+                        prevRow[j - 1], // No warping
+                        Math.Min(
+                            prevRow[j], // Stretching
+                            (j >= 2) ? prevRow[j - 2] : double.PositiveInfinity // Shrinking
+                        )
+                    );
+                    currRow[j] = cost + minPrev;
                 }
-                double res2 = 0;
-                for (int k = 0; k < 13; ++k)
-                    res2 += (A.Frames[i - 1].Features[k] - B.Frames[0].Features[k]) * (A.Frames[0].Features[k] - B.Frames[0].Features[k]);
-                res2 = Math.Sqrt(res2);
-                dp[1] = Math.Min(dp[0], dp[1]) + res2;
-                dp[0] = double.PositiveInfinity;
+                double[] temp = prevRow;
+                prevRow = currRow;
+                currRow = temp;
             }
-            return dp[m];
+            return prevRow[m];
         }
 
         public static double dynamicTimeWarpingWithPruning(Sequence A, Sequence B, int W) // Ebrahim & Adham
         {
 
-            // Each sequence is a list of frames.
+           // Each sequence is a list of frames.
             // we want to compute min distance between the two sequences USING DP.
             //Transtions:
             // 1. Next input frame aligns to same template frame (stretching).
@@ -105,39 +106,29 @@ namespace Recorder
             return dtw[n, m];
         }
 
-        private static SortedDictionary<string, List<Sequence>> dataset = new SortedDictionary<string, List<Sequence>>();
+        private static Dictionary<string, List<Sequence>> dataset = new Dictionary<string, List<Sequence>>();
         public static void enroll(string name, AudioSignal record) // Ebrahim & Adham
         {
             Sequence sequence = AudioOperations.ExtractFeatures(AudioOperations.RemoveSilence(record));
             dataset[name].Add(sequence);
         }
-        public struct BestSequence
+
+        public static string identify(Sequence A) // Ibrahim & Zamel
         {
-            private string name;
-            private double distance;
-            public BestSequence(string name, double distance)
-            {
-                this.name = name;
-                this.distance = distance;
-            }
-        }
-        public static BestSequence identify(Sequence A, int W = -1) // Ibrahim & Zamel
-        {
-            String name = null;
+            String ans = null;
             double mn = double.MaxValue;
             // loop over dataset and minimize the distance
-            foreach(var user in dataset)
-                foreach(var sequence in user.Value)
+            foreach (var user in dataset)
+                foreach (var sequence in user.Value)
                 {
-                    double distance = W==-1?dynamicTimeWarping(A, sequence) : dynamicTimeWarpingWithPruning(A, sequence, W);
+                    double distance = dynamicTimeWarping(A, sequence);
                     if (distance < mn)
                     {
                         mn = distance;
-                        name = user.Key;
+                        ans = user.Key;
                     }
                 }
-            return new BestSequence(name, mn);
+            return ans;
         }
-
     }
 }
