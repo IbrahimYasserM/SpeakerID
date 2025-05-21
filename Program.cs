@@ -34,12 +34,12 @@ namespace Recorder
                 char choice = Console.ReadKey().KeyChar;
                 if (choice == 'P' || choice == 'p')
                 {
-                    MainProgramRunner();
+                    MainProgramProgram();
                     break;
                 }
                 else if (choice == 'T' || choice == 't')
                 {
-                    TestCasesRunner();
+                    TestCasesProgram();
                     break;
                 }
                 else
