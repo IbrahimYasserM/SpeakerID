@@ -14,7 +14,7 @@ namespace Recorder
     {
         // get the elidean distance between two frames
         // each frame has 13 coefficients (features).
-        public static double getuEuclideanDistance(double[] frameA, double[] frameB)
+        private static double getuEuclideanDistance(double[] frameA, double[] frameB)
         {
             double res = 0;
             for (int i = 0; i < 13; i++)
@@ -62,7 +62,7 @@ namespace Recorder
         public static double dynamicTimeWarpingWithPruning(Sequence A, Sequence B, int W) // Ebrahim & Adham
         {
 
-           // Each sequence is a list of frames.
+            // Each sequence is a list of frames.
             // we want to compute min distance between the two sequences USING DP.
             //Transtions:
             // 1. Next input frame aligns to same template frame (stretching).
@@ -105,10 +105,11 @@ namespace Recorder
             return dtw[n, m];
         }
 
-
-        public static void enroll() // Ebrahim & Adham
+        private static Dictionary<string, List<Sequence>> dataset = new Dictionary<string, List<Sequence>>();
+        public static void enroll(string name, AudioSignal record) // Ebrahim & Adham
         {
-
+            Sequence sequence = AudioOperations.ExtractFeatures(AudioOperations.RemoveSilence(record));
+            dataset[name].Add(sequence);
         }
 
         public static string identify(Sequence A) // Ibrahim & Zamel
@@ -116,6 +117,16 @@ namespace Recorder
             String ans = null;
             double mn = double.MaxValue;
             // loop over dataset and minimize the distance
+            foreach(var user in dataset)
+                foreach(var sequence in user.Value)
+                {
+                    double distance = dynamicTimeWarping(A, sequence);
+                    if (distance < mn)
+                    {
+                        mn = distance;
+                        ans = user.Key;
+                    }
+                }
             return ans;
         }
 
