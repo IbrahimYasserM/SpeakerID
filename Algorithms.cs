@@ -112,6 +112,8 @@ namespace Recorder
         public static void enroll(string name, AudioSignal record) // Ebrahim & Adham
         {
             Sequence sequence = AudioOperations.ExtractFeatures(AudioOperations.RemoveSilence(record));
+            if (!dataset.ContainsKey(name))
+                dataset.Add(name, new List<Sequence>());
             dataset[name].Add(sequence);
         }
 

@@ -23,7 +23,7 @@ namespace Recorder
         ///     2. sample rate
         ///     3. signal length in ms
         /// </summary>
-        private AudioSignal signal = null;
+        private AudioSignal signal = null, savedSignal = null;
         Sequence seq = null;
        
         private string path;
@@ -43,6 +43,10 @@ namespace Recorder
             updateButtons();
         }
 
+        public AudioSignal getSignal()
+        {
+            return savedSignal;
+        }
 
         /// <summary>
         ///   Starts recording audio from the sound card
@@ -296,7 +300,6 @@ namespace Recorder
                     }
                 }
                 updateButtons();
-                Console.WriteLine("Hello");
             }
         }
 
@@ -308,7 +311,7 @@ namespace Recorder
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-
+            savedSignal = signal;
         }
 
         private void loadTrain1ToolStripMenuItem_Click(object sender, EventArgs e)

@@ -12,8 +12,7 @@ namespace Recorder
 {
     static class Program
     {
-       
-        [STAThread]
+        private static MainForm mainForm = null;
         private static void TestCasesProgram()
         {
             TestCasesRunner.runSample(1, true, 333);
@@ -21,15 +20,21 @@ namespace Recorder
         }
         private static AudioSignal inputAdioSignal()
         {
+            mainForm = new MainForm();
+            Application.Run(mainForm);
+            AudioSignal audioSignal = mainForm.getSignal();
+            if(audioSignal == null)
+                throw new Exception("No audio signal was recorded");
+            return audioSignal;
+        }
+        private static void MainProgramProgram()
+        {
+
             if (Environment.OSVersion.Version.Major >= 6)
                 SetProcessDPIAware();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
-            return new AudioSignal();
-        }
-        private static void MainProgramProgram()
-        {
+            mainForm = new MainForm();
             while (true)
             {
                 Console.WriteLine("Do you want to add a new audio into the database(A) or identify an audio(I) or any other key to exit");
@@ -63,6 +68,7 @@ namespace Recorder
                     break;
             }
         }
+        [STAThread]
         static void Main()
         {
             while(true)
