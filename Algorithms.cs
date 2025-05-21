@@ -66,33 +66,35 @@ namespace Recorder
             int n = A.Frames.Length;
             int m = B.Frames.Length;
 
-            double[] dp = new double[m + 1];
+            double[] prevRow = new double[m + 1];
+            double[] currRow = new double[m + 1];
 
-            for (int j = 1; j <= m; j++)
-                dp[j] = double.PositiveInfinity;
-            dp[0] = 0;
+            for (int j = 0; j <= m; j++)
+                prevRow[j] = double.PositiveInfinity;
+            prevRow[0] = 0;
 
             for (int i = 1; i <= n; i++)
             {
-                for (int j = m; j > 1; --j)
+                for (int j = 0; j <= m; j++)
+                    currRow[j] = double.PositiveInfinity;
+                var aFeatures = A.Frames[i - 1].Features;
+                for (int j = 1; j <= m; j++)
                 {
-                    double res = 0;
-                    for (int k = 0; k < 13; ++k)
-                        res += (A.Frames[i - 1].Features[k] - B.Frames[j - 1].Features[k]) * (A.Frames[i - 1].Features[k] - B.Frames[j - 1].Features[k]);
-                    res = Math.Sqrt(res);
-                    dp[j] = Math.Min(
-                        Math.Min(dp[j], dp[j - 1]),
-                        dp[j - 2]
-                    ) + res;
+                    double cost = getuEuclideanDistance(aFeatures, B.Frames[j - 1].Features);
+                    double minPrev = Math.Min(
+                        prevRow[j - 1], // No warping
+                        Math.Min(
+                            prevRow[j], // Stretching
+                            (j >= 2) ? prevRow[j - 2] : double.PositiveInfinity // Shrinking
+                        )
+                    );
+                    currRow[j] = cost + minPrev;
                 }
-                double res2 = 0;
-                for (int k = 0; k < 13; ++k)
-                    res2 += (A.Frames[i - 1].Features[k] - B.Frames[0].Features[k]) * (A.Frames[0].Features[k] - B.Frames[0].Features[k]);
-                res2 = Math.Sqrt(res2);
-                dp[1] = Math.Min(dp[0], dp[1]) + res2;
-                dp[0] = double.PositiveInfinity;
+                double[] temp = prevRow;
+                prevRow = currRow;
+                currRow = temp;
             }
-            return dp[m];
+            return prevRow[m];
         }
 
         public static double dynamicTimeWarpingWithPruning(Sequence A, Sequence B, int W) // Ebrahim & Adham
