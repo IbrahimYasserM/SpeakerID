@@ -21,13 +21,12 @@ namespace Recorder
         }
         private static AudioSignal inputAdioSignal()
         {
-            throw new NotImplementedException();
-            //if (Environment.OSVersion.Version.Major >= 6)
-            //    SetProcessDPIAware();
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new MainForm());
-            //return new AudioSignal();
+            if (Environment.OSVersion.Version.Major >= 6)
+                SetProcessDPIAware();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new MainForm());
+            return new AudioSignal();
         }
         private static void MainProgramProgram()
         {

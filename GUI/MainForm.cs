@@ -296,7 +296,7 @@ namespace Recorder
                     }
                 }
                 updateButtons();
-
+                Console.WriteLine("Hello");
             }
         }
 
