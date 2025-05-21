@@ -37,11 +37,15 @@ namespace Recorder
             dp[0] = 0;
 
             for (int i = 1; i <= n; i++)
-                for (int j = m; j > 0; --j)
+            {
+                for (int j = m; j > 1; --j)
                     dp[j] = Math.Min(
-                        dp[j - 1], 
-                        (j >= 2) ? dp[j - 2] : double.PositiveInfinity + getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 2].Features)
+                        dp[j - 1],
+                        dp[j - 2] + getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 2].Features)
                     ) + getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 1].Features);
+                dp[1] = dp[j-1] + getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 1].Features);
+                dp[0] = double.PositiveInfinity;
+            }
             return dp[m];
         }
 
