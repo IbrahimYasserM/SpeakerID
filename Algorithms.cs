@@ -6,46 +6,11 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace Recorder
 {
-    struct Frame
-    {
-        public double[,] dp;
-        public Frame(int n, int m)
-        {
-            this.dp = new double[n + 1, m + 1];
-            for (int i = 0; i <= n; i++)
-                for (int j = 0; j <= m; j++)
-                    dp[i, j] = double.PositiveInfinity;
-            dp[0, 0] = 0;
-        }
-
-    }
-    struct point
-    {
-        public double dist;
-        public int i, j, k;
-        public point(int i, int j, int k, double dist)
-        {
-            this.i = i;
-            this.j = j;
-            this.k = k;
-            this.dist = dist;
-        }
-    }
-
-    struct Pair
-    {
-        public double dist;
-        public int ind;
-        public Pair(double dist, int ind)
-        {
-            this.dist = dist;
-            this.ind = ind;
-        }
-    }
     static class Algorithms
     {
         // get the elidean distance between two frames
@@ -143,29 +108,40 @@ namespace Recorder
             return dtw[n, m];
         }
         
-        private static Dictionary<string, List<Sequence>> dataset = new Dictionary<string, List<Sequence>>();
+        private static SortedDictionary<string, List<Sequence>> dataset = new SortedDictionary<string, List<Sequence>>();
         public static void enroll(string name, AudioSignal record) // Ebrahim & Adham
         {
             Sequence sequence = AudioOperations.ExtractFeatures(AudioOperations.RemoveSilence(record));
             dataset[name].Add(sequence);
         }
 
-        public static string identify(Sequence A) // Ibrahim & Zamel
+        public struct BestSequence
         {
-            String ans = null;
+            public string name;
+            public double distance;
+            public BestSequence(string name, double distance)
+            {
+                this.name = name;
+                this.distance = distance;
+            }
+        }
+        public static BestSequence identify(AudioSignal signal, int W = -1) // Ibrahim & Zamel
+        {
+            Sequence A = AudioOperations.ExtractFeatures(AudioOperations.RemoveSilence(signal));
+            String name = null;
             double mn = double.MaxValue;
             // loop over dataset and minimize the distance
             foreach(var user in dataset)
                 foreach(var sequence in user.Value)
                 {
-                    double distance = dynamicTimeWarping(A, sequence);
+                    double distance = W == -1 ? dynamicTimeWarping(A, sequence) : dynamicTimeWarpingWithPruning(A, sequence, W);
                     if (distance < mn)
                     {
                         mn = distance;
-                        ans = user.Key;
+                        name = user.Key;
                     }
                 }
-            return ans;
+            return new BestSequence(name, mn);
         }
 
     }
