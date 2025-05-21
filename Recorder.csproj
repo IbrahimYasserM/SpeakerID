@@ -107,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithms.cs" />
+    <Compile Include="bonus.cs" />
     <Compile Include="MainFuctions\AudioOperations.cs" />
     <Compile Include="GUI\MainForm.cs">
       <SubType>Form</SubType>

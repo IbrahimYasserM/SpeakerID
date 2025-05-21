@@ -9,6 +9,7 @@ namespace Recorder
 {
     static class TestCasesRunner
     {
+
         // minutes  , WithSilence, W
         public static void runSample(int min,bool silence, int W) {
             string pathInput = "SAMPLE/Pruning Test/" + min.ToString() + " min/" + "[Input] Why Study Algorithms - (" + min.ToString() + " min).wav";
@@ -44,30 +45,44 @@ namespace Recorder
 
         }
 
-        public static void runTestCase1(int W) {
+        public static void runTestCase(int test , int W) {
             //load & extract features of the train set.
             Stopwatch trainTime = new Stopwatch();
             // Train time 
             trainTime.Start();
-            var trainSet = TestcaseLoader.LoadTestcase1Training("TrainingList.txt");
+            List<User> trainSet = new List<User>();
+            if(test == 1)
+                trainSet = TestcaseLoader.LoadTestcase1Training("case" + test.ToString() + "\\TrainingList.txt");
+            else if (test == 2)
+                trainSet = TestcaseLoader.LoadTestcase2Training("case" + test.ToString() + "\\TrainingList5Samples.txt");
+            else if (test == 3)
+                trainSet = TestcaseLoader.LoadTestcase3Training("case" + test.ToString() + "\\TrainingList1Sample.txt");
+
             var trainExtracted = TestController.extractFeatures(trainSet);
             trainTime.Stop();
 
             // load & extract features of the test set.
             Stopwatch loadTestTime = new Stopwatch();
             loadTestTime.Start();
-            var testDataset = TestcaseLoader.LoadTestcase1Testing("TestingList5Samples.txt");
+            List<User> testDataset = new List<User>();
+            if (test == 1)
+                testDataset = TestcaseLoader.LoadTestcase1Testing("case" + test.ToString() + "\\TestingList5Samples.txt");
+            else if (test == 2)
+                testDataset = TestcaseLoader.LoadTestcase2Testing("case" + test.ToString() + "\\TestingList1Sample.txt");
+            else if (test == 3)
+                testDataset = TestcaseLoader.LoadTestcase3Testing("case" + test.ToString() + "\\TestingList.txt");
+
             var testExtracted = TestController.extractFeatures(testDataset);
             loadTestTime.Stop();
 
             Stopwatch matchTime = new Stopwatch();
             matchTime.Start();
-            var result = TestController.matching(trainExtracted, testExtracted);
+            var result = TestController.syncMatching(trainExtracted, testExtracted);
             matchTime.Stop();
 
             Stopwatch matchTimeWithP = new Stopwatch();
             matchTimeWithP.Start();
-            var resultWithP = TestController.matchingWithPruning(trainExtracted, testExtracted, W);
+            var resultWithP = TestController.matching(trainExtracted, testExtracted);
             matchTimeWithP.Stop();
 
             Console.WriteLine("Load & Extract TrainingSet: " + ((trainTime.ElapsedMilliseconds)/1000.0 )/60.0);
@@ -77,5 +92,7 @@ namespace Recorder
             Console.WriteLine("DTW Accuracy With Pruning: " + resultWithP);
             Console.WriteLine("DTW with Pruning Time: " + ((matchTimeWithP.ElapsedMilliseconds + loadTestTime.ElapsedMilliseconds) / 1000.0) / 60.0);
         }
+
+        
     }
 }

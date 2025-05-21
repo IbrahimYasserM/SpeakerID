@@ -91,5 +91,30 @@ namespace Recorder
             }
             return (cnt/sum)*100.0f;
         }
+        public static  double syncMatching(List<user>trainingSet , List<user> testingSet)
+        {    
+            double sum=0, cnt = 0;
+            for (int i = 0; i < testingSet.Count; i++)
+            {
+                sum+= testingSet[i].userTemplates.Count;
+                foreach (var sequence in testingSet[i].userTemplates)
+                {
+                    double minDistance = double.MaxValue;
+                    string minUser = null;
+                    for (int j = 0; j < trainingSet.Count; j++)
+                    {
+                        var dis = bonus.syncDTW(sequence, trainingSet[i].userTemplates);
+                        if(dis.dist < minDistance)
+                        {
+                            minDistance = dis.dist;
+                            minUser = trainingSet[j].userName;
+                        }
+                    }
+                    if (minUser == testingSet[i].userName)
+                        cnt++;
+                }
+            }
+            return (cnt/sum)*100.0f;
+        }
     }
 }

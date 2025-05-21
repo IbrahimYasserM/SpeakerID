@@ -15,8 +15,10 @@ namespace Recorder
         [STAThread]
         static void TestCasesProgram()
         {
-            TestCasesRunner.runSample(1, true, 333);
-            TestCasesRunner.runTestCase1(23);
+            // min , WithSilence, Pruning Width
+            //TestCasesRunner.runSample(1, true, 333);
+            // Case , Pruning Width
+            TestCasesRunner.runTestCase(1,23);
         }
         static void MainProgramProgram()
         {
@@ -28,7 +30,7 @@ namespace Recorder
         }
         static void Main()
         {
-            while(true)
+            while (true)
             {
                 Console.WriteLine("Do you want to run the Program(P) or run the Tests(T)");
                 char choice = Console.ReadKey().KeyChar;
@@ -45,6 +47,8 @@ namespace Recorder
                 else
                     Console.WriteLine("Invalid choice, please enter P or T");
             }
+
+
         }
 
 
