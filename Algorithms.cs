@@ -32,18 +32,28 @@ namespace Recorder
 
             double[] dp = new double[m + 1];
 
-            for (int j = 0; j <= m; j++)
+            for (int j = 1; j <= m; j++)
                 dp[j] = double.PositiveInfinity;
             dp[0] = 0;
 
             for (int i = 1; i <= n; i++)
             {
                 for (int j = m; j > 1; --j)
+                {
+                    double res = 0;
+                    for (int k = 0; k < 13; ++k)
+                        res += (A.Frames[i - 1].Features[k] - B.Frames[j - 1].Features[k]) * (A.Frames[i - 1].Features[k] - B.Frames[j - 1].Features[k]);
+                    res = Math.Sqrt(res);
                     dp[j] = Math.Min(
-                        dp[j - 1],
-                        dp[j - 2] + getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 2].Features)
-                    ) + getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 1].Features);
-                dp[1] = dp[j-1] + getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 1].Features);
+                        Math.Min(dp[j], dp[j - 1]),
+                        dp[j - 2]
+                    ) + res;
+                }
+                double res2 = 0;
+                for (int k = 0; k < 13; ++k)
+                    res2 += (A.Frames[i - 1].Features[k] - B.Frames[0].Features[k]) * (A.Frames[0].Features[k] - B.Frames[0].Features[k]);
+                res2 = Math.Sqrt(res2);
+                dp[1] = Math.Min(dp[0], dp[1]) + res2;
                 dp[0] = double.PositiveInfinity;
             }
             return dp[m];
