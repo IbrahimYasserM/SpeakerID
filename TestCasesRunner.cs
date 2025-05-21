@@ -44,6 +44,38 @@ namespace Recorder
 
         }
 
+        public static void runTestCase1(int W) {
+            //load & extract features of the train set.
+            Stopwatch trainTime = new Stopwatch();
+            // Train time 
+            trainTime.Start();
+            var trainSet = TestcaseLoader.LoadTestcase1Training("TrainingList.txt");
+            var trainExtracted = TestController.extractFeatures(trainSet);
+            trainTime.Stop();
 
+            // load & extract features of the test set.
+            Stopwatch loadTestTime = new Stopwatch();
+            loadTestTime.Start();
+            var testDataset = TestcaseLoader.LoadTestcase1Testing("TestingList5Samples.txt");
+            var testExtracted = TestController.extractFeatures(testDataset);
+            loadTestTime.Stop();
+
+            Stopwatch matchTime = new Stopwatch();
+            matchTime.Start();
+            var result = TestController.matching(trainExtracted, testExtracted);
+            matchTime.Stop();
+
+            Stopwatch matchTimeWithP = new Stopwatch();
+            matchTimeWithP.Start();
+            var resultWithP = TestController.matchingWithPruning(trainExtracted, testExtracted, W);
+            matchTimeWithP.Stop();
+
+            Console.WriteLine("Load & Extract TrainingSet: " + ((trainTime.ElapsedMilliseconds)/1000.0 )/60.0);
+            Console.WriteLine("DTW Accuracy: " + result);
+            Console.WriteLine("DTW Time: " + ((matchTime.ElapsedMilliseconds + loadTestTime.ElapsedMilliseconds) / 1000.0) / 60.0);
+            Console.WriteLine("------------------------------");
+            Console.WriteLine("DTW Accuracy With Pruning: " + resultWithP);
+            Console.WriteLine("DTW with Pruning Time: " + ((matchTimeWithP.ElapsedMilliseconds + loadTestTime.ElapsedMilliseconds) / 1000.0) / 60.0);
+        }
     }
 }
