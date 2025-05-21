@@ -54,9 +54,9 @@ namespace Recorder
             if(test == 1)
                 trainSet = TestcaseLoader.LoadTestcase1Training("case" + test.ToString() + "\\TrainingList.txt");
             else if (test == 2)
-                trainSet = TestcaseLoader.LoadTestcase2Training("case" + test.ToString() + "\\TrainingList5Samples.txt");
+                trainSet = TestcaseLoader.LoadTestcase1Training("case" + test.ToString() + "\\TrainingList5Samples.txt");
             else if (test == 3)
-                trainSet = TestcaseLoader.LoadTestcase3Training("case" + test.ToString() + "\\TrainingList1Sample.txt");
+                trainSet = TestcaseLoader.LoadTestcase1Training("case" + test.ToString() + "\\TrainingList1Sample.txt");
 
             var trainExtracted = TestController.extractFeatures(trainSet);
             trainTime.Stop();
@@ -68,21 +68,21 @@ namespace Recorder
             if (test == 1)
                 testDataset = TestcaseLoader.LoadTestcase1Testing("case" + test.ToString() + "\\TestingList5Samples.txt");
             else if (test == 2)
-                testDataset = TestcaseLoader.LoadTestcase2Testing("case" + test.ToString() + "\\TestingList1Sample.txt");
+                testDataset = TestcaseLoader.LoadTestcase1Testing("case" + test.ToString() + "\\TestingList1Sample.txt");
             else if (test == 3)
-                testDataset = TestcaseLoader.LoadTestcase3Testing("case" + test.ToString() + "\\TestingList.txt");
+                testDataset = TestcaseLoader.LoadTestcase1Testing("case" + test.ToString() + "\\TestingList.txt");
 
             var testExtracted = TestController.extractFeatures(testDataset);
             loadTestTime.Stop();
 
             Stopwatch matchTime = new Stopwatch();
             matchTime.Start();
-            var result = TestController.syncMatching(trainExtracted, testExtracted);
+            var result = TestController.matching(trainExtracted, testExtracted);
             matchTime.Stop();
 
             Stopwatch matchTimeWithP = new Stopwatch();
             matchTimeWithP.Start();
-            var resultWithP = TestController.matching(trainExtracted, testExtracted);
+            var resultWithP = TestController.matchingWithPruning(trainExtracted, testExtracted,W);
             matchTimeWithP.Stop();
 
             Console.WriteLine("Load & Extract TrainingSet: " + ((trainTime.ElapsedMilliseconds)/1000.0 )/60.0);
