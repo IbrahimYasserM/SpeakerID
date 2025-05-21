@@ -121,6 +121,7 @@
     <Compile Include="Recorder\Decoder.cs" />
     <Compile Include="Recorder\Encoder.cs" />
     <Compile Include="TestcaseLoader.cs" />
+    <Compile Include="TestCasesRunner.cs" />
     <Compile Include="TestController.cs" />
     <EmbeddedResource Include="GUI\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
