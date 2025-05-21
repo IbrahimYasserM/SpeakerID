@@ -12,7 +12,6 @@ namespace Recorder
     static class Program
     {
        
-        [STAThread]
         static void TestCasesProgram()
         {
             // min , WithSilence, Pruning Width
@@ -28,6 +27,7 @@ namespace Recorder
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm());
         }
+        [STAThread]
         static void Main()
         {
             while (true)
@@ -47,7 +47,7 @@ namespace Recorder
                 else
                     Console.WriteLine("Invalid choice, please enter P or T");
             }
-
+            
 
         }
 

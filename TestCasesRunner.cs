@@ -34,7 +34,7 @@ namespace Recorder
 
             Stopwatch dtwPtime = new Stopwatch();
             dtwPtime.Start();
-            double dtwPDis = Algorithms.dynamicTimeWarpingWithPruning(inputseq, tempseq, 1111);
+            double dtwPDis = Algorithms.dynamicTimeWarpingWithPruning(inputseq, tempseq, W);
             dtwPtime.Stop();
 
             Console.WriteLine("Distance With DTW: " + dtwDis);

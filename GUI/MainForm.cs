@@ -296,7 +296,6 @@ namespace Recorder
                     }
                 }
                 updateButtons();
-
             }
         }
 
