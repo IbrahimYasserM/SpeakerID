@@ -27,12 +27,6 @@ namespace Recorder
 
         public static double dynamicTimeWarping(Sequence A, Sequence B)
         {
-            // Each sequence is a list of frames.
-            // we want to compute min distance between the two sequences USING DP.
-            //Transtions:
-            // 1. Next input frame aligns to same template frame (stretching).
-            // 2. Next input frame aligns to next template frame (no warping).
-            // 3. Next input frame skips one template frame (shrinking, at most 1/2).
             int n = A.Frames.Length;
             int m = B.Frames.Length;
 
@@ -45,11 +39,8 @@ namespace Recorder
             for (int i = 1; i <= n; i++)
                 for (int j = m; j > 0; --j)
                     dp[j] = Math.Min(
-                        dp[j - 1], // No warping
-                        Math.Min(
-                            dp[j], // Stretching
-                            (j >= 2) ? dp[j - 2] : double.PositiveInfinity // Shrinking
-                        )
+                        dp[j - 1], 
+                        (j >= 2) ? dp[j - 2] : double.PositiveInfinity + getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 2].Features)
                     ) + getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 1].Features);
             return dp[m];
         }
