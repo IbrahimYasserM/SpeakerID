@@ -10,6 +10,42 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace Recorder
 {
+    struct Frame
+    {
+        public double[,] dp;
+        public Frame(int n, int m)
+        {
+            this.dp = new double[n + 1, m + 1];
+            for (int i = 0; i <= n; i++)
+                for (int j = 0; j <= m; j++)
+                    dp[i, j] = double.PositiveInfinity;
+            dp[0, 0] = 0;
+        }
+
+    }
+    struct point
+    {
+        public double dist;
+        public int i, j, k;
+        public point(int i, int j, int k, double dist)
+        {
+            this.i = i;
+            this.j = j;
+            this.k = k;
+            this.dist = dist;
+        }
+    }
+
+    struct Pair
+    {
+        public double dist;
+        public int ind;
+        public Pair(double dist, int ind)
+        {
+            this.dist = dist;
+            this.ind = ind;
+        }
+    }
     static class Algorithms
     {
   
@@ -105,7 +141,7 @@ namespace Recorder
 
             return dtw[n, m];
         }
-
+        
         private static Dictionary<string, List<Sequence>> dataset = new Dictionary<string, List<Sequence>>();
         public static void enroll(string name, AudioSignal record) // Ebrahim & Adham
         {
