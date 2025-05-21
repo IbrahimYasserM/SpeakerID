@@ -36,36 +36,22 @@ namespace Recorder
             int n = A.Frames.Length;
             int m = B.Frames.Length;
 
-            double[] prevRow = new double[m + 1];
-            double[] currRow = new double[m + 1];
+            double[] dp = new double[m + 1];
 
             for (int j = 0; j <= m; j++)
-                prevRow[j] = double.PositiveInfinity;
-            prevRow[0] = 0;
+                dp[j] = double.PositiveInfinity;
+            dp[0] = 0;
 
             for (int i = 1; i <= n; i++)
-            {
-                for (int j = 0; j <= m; j++)
-                    currRow[j] = double.PositiveInfinity;
-                var aFeatures = A.Frames[i - 1].Features;
-                for (int j = 1; j <= m; j++)
-                {
-                    double cost = getuEuclideanDistance(aFeatures, B.Frames[j - 1].Features);
-                    double minPrev = Math.Min(
-                        prevRow[j - 1], // No warping
+                for (int j = m; j > 0; --j)
+                    dp[j] = Math.Min(
+                        dp[j - 1], // No warping
                         Math.Min(
-                            prevRow[j], // Stretching
-                            (j >= 2) ? prevRow[j - 2] : double.PositiveInfinity // Shrinking
+                            dp[j], // Stretching
+                            (j >= 2) ? dp[j - 2] : double.PositiveInfinity // Shrinking
                         )
-                    );
-                    currRow[j] = cost + minPrev;
-                }
-                // Swap rows for next iteration
-                    double[] temp = prevRow;
-                    prevRow = currRow;
-                    currRow = temp;
-            }
-            return prevRow[m];
+                    ) + getuEuclideanDistance(A.Frames[i - 1].Features, B.Frames[j - 1].Features);
+            return dp[m];
         }
 
         public static double dynamicTimeWarpingWithPruning(Sequence A, Sequence B, int W) // Ebrahim & Adham
