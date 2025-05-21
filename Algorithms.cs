@@ -105,29 +105,38 @@ namespace Recorder
             return dtw[n, m];
         }
 
-        private static Dictionary<string, List<Sequence>> dataset = new Dictionary<string, List<Sequence>>();
+        private static SortedDictionary<string, List<Sequence>> dataset = new SortedDictionary<string, List<Sequence>>();
         public static void enroll(string name, AudioSignal record) // Ebrahim & Adham
         {
             Sequence sequence = AudioOperations.ExtractFeatures(AudioOperations.RemoveSilence(record));
             dataset[name].Add(sequence);
         }
-
-        public static string identify(Sequence A) // Ibrahim & Zamel
+        public struct BestSequence
         {
-            String ans = null;
+            private string name;
+            private double distance;
+            public BestSequence(string name, double distance)
+            {
+                this.name = name;
+                this.distance = distance;
+            }
+        }
+        public static BestSequence identify(Sequence A, int W = -1) // Ibrahim & Zamel
+        {
+            String name = null;
             double mn = double.MaxValue;
             // loop over dataset and minimize the distance
             foreach(var user in dataset)
                 foreach(var sequence in user.Value)
                 {
-                    double distance = dynamicTimeWarping(A, sequence);
+                    double distance = W==-1?dynamicTimeWarping(A, sequence) : dynamicTimeWarpingWithPruning(A, sequence, W);
                     if (distance < mn)
                     {
                         mn = distance;
-                        ans = user.Key;
+                        name = user.Key;
                     }
                 }
-            return ans;
+            return new BestSequence(name, mn);
         }
 
     }
