@@ -9,12 +9,12 @@ namespace Recorder
 {
     static class TestCasesRunner
     {
-
         // minutes  , WithSilence, W
-        public static void runSample(int min,bool silence, int W) {
+        public static void runSample(int min, bool silence, int W)
+        {
             string pathInput = "SAMPLE/Pruning Test/" + min.ToString() + " min/" + "[Input] Why Study Algorithms - (" + min.ToString() + " min).wav";
             string pathTemp = "SAMPLE/Pruning Test/" + min.ToString() + " min/" + "[Template] Big-Oh Notation (" + min.ToString() + " min).wav";
-            
+
             var input = AudioOperations.OpenAudioFile(pathInput);
             var temp = AudioOperations.OpenAudioFile(pathTemp);
 
@@ -29,12 +29,12 @@ namespace Recorder
 
             Stopwatch dtwTime = new Stopwatch();
             dtwTime.Start();
-            double dtwDis = Algorithms.dynamicTimeWarping(inputseq, tempseq); 
+            double dtwDis = Algorithms.dynamicTimeWarping(inputseq, tempseq);
             dtwTime.Stop();
 
             Stopwatch dtwPtime = new Stopwatch();
             dtwPtime.Start();
-            double dtwPDis = Algorithms.dynamicTimeWarpingWithPruning(inputseq, tempseq, W);
+            double dtwPDis = Algorithms.dynamicTimeWarpingWithPruning(inputseq, tempseq, 1111);
             dtwPtime.Stop();
 
             Console.WriteLine("Distance With DTW: " + dtwDis);
@@ -45,33 +45,20 @@ namespace Recorder
 
         }
 
-        public static void runTestCase(int test , int W) {
+        public static void runTestCase1(int W)
+        {
             //load & extract features of the train set.
             Stopwatch trainTime = new Stopwatch();
             // Train time 
             trainTime.Start();
-            List<User> trainSet = new List<User>();
-            if(test == 1)
-                trainSet = TestcaseLoader.LoadTestcase1Training("case" + test.ToString() + "\\TrainingList.txt");
-            else if (test == 2)
-                trainSet = TestcaseLoader.LoadTestcase1Training("case" + test.ToString() + "\\TrainingList5Samples.txt");
-            else if (test == 3)
-                trainSet = TestcaseLoader.LoadTestcase1Training("case" + test.ToString() + "\\TrainingList1Sample.txt");
-
+            var trainSet = TestcaseLoader.LoadTestcase1Training("TrainingList.txt");
             var trainExtracted = TestController.extractFeatures(trainSet);
             trainTime.Stop();
 
             // load & extract features of the test set.
             Stopwatch loadTestTime = new Stopwatch();
             loadTestTime.Start();
-            List<User> testDataset = new List<User>();
-            if (test == 1)
-                testDataset = TestcaseLoader.LoadTestcase1Testing("case" + test.ToString() + "\\TestingList5Samples.txt");
-            else if (test == 2)
-                testDataset = TestcaseLoader.LoadTestcase1Testing("case" + test.ToString() + "\\TestingList1Sample.txt");
-            else if (test == 3)
-                testDataset = TestcaseLoader.LoadTestcase1Testing("case" + test.ToString() + "\\TestingList.txt");
-
+            var testDataset = TestcaseLoader.LoadTestcase1Testing("TestingList5Samples.txt");
             var testExtracted = TestController.extractFeatures(testDataset);
             loadTestTime.Stop();
 
@@ -82,17 +69,15 @@ namespace Recorder
 
             Stopwatch matchTimeWithP = new Stopwatch();
             matchTimeWithP.Start();
-            var resultWithP = TestController.matchingWithPruning(trainExtracted, testExtracted,W);
+            var resultWithP = TestController.matchingWithPruning(trainExtracted, testExtracted, W);
             matchTimeWithP.Stop();
 
-            Console.WriteLine("Load & Extract TrainingSet: " + ((trainTime.ElapsedMilliseconds)/1000.0 )/60.0);
+            Console.WriteLine("Load & Extract TrainingSet: " + ((trainTime.ElapsedMilliseconds) / 1000.0) / 60.0);
             Console.WriteLine("DTW Accuracy: " + result);
             Console.WriteLine("DTW Time: " + ((matchTime.ElapsedMilliseconds + loadTestTime.ElapsedMilliseconds) / 1000.0) / 60.0);
             Console.WriteLine("------------------------------");
             Console.WriteLine("DTW Accuracy With Pruning: " + resultWithP);
             Console.WriteLine("DTW with Pruning Time: " + ((matchTimeWithP.ElapsedMilliseconds + loadTestTime.ElapsedMilliseconds) / 1000.0) / 60.0);
         }
-
-        
     }
 }
