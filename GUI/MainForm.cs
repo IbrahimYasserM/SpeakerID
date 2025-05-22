@@ -8,6 +8,7 @@ using Accord.DirectSound;
 using Accord.Audio.Filters;
 using Recorder.Recorder;
 using Recorder.MFCC;
+using System.Collections.Generic;
 
 namespace Recorder
 {
@@ -23,10 +24,11 @@ namespace Recorder
         ///     2. sample rate
         ///     3. signal length in ms
         /// </summary>
-        private AudioSignal signal = null;
+        private AudioSignal signal = null, savedSignal = null;
         Sequence seq = null;
-       
+        List<AudioSignal> signals = new List<AudioSignal>();
         private string path;
+        public static string AudioPath;
 
         private Encoder encoder;
         private Decoder decoder;
@@ -43,6 +45,10 @@ namespace Recorder
             updateButtons();
         }
 
+        public AudioSignal getSignal()
+        {
+            return savedSignal;
+        }
 
         /// <summary>
         ///   Starts recording audio from the sound card
@@ -92,7 +98,7 @@ namespace Recorder
         /// 
         private void btnStop_Click(object sender, EventArgs e)
         {
-            Stop();   
+            Stop();
             updateButtons();
             updateWaveform(new float[BaseRecorder.FRAME_SIZE], BaseRecorder.FRAME_SIZE);
         }
@@ -118,7 +124,7 @@ namespace Recorder
         {
             this.encoder.addNewFrame(eventArgs.Signal);
             updateWaveform(this.encoder.current, eventArgs.Signal.Length);
-       }
+        }
 
 
         /// <summary>
@@ -282,15 +288,22 @@ namespace Recorder
             {
                 isRecorded = false;
                 path = open.FileName;
-                //Open the selected audio file
+                AudioPath = path;
                 signal = AudioOperations.OpenAudioFile(path);
+
+                Console.WriteLine(path);
+
+
+
                 signal = AudioOperations.RemoveSilence(signal);
-                 seq = AudioOperations.ExtractFeatures(signal);
+                seq = AudioOperations.ExtractFeatures(signal);
+
+
+
                 for (int i = 0; i < seq.Frames.Length; i++)
                 {
                     for (int j = 0; j < 13; j++)
                     {
-
                         if (double.IsNaN(seq.Frames[i].Features[j]) || double.IsInfinity(seq.Frames[i].Features[j]))
                             throw new Exception("NaN");
                     }
@@ -307,7 +320,7 @@ namespace Recorder
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-
+            savedSignal = signal;
         }
 
         private void loadTrain1ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -318,9 +331,59 @@ namespace Recorder
 
         }
 
+        public void loadFromDatabase()
+        {
+            string filePath = "AudioPaths.txt";
 
-        
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine($"Database file '{filePath}' not found, Creating file instead.");
+                File.Create(filePath).Close();
+                return;
+            }
+
+            string[] lines = File.ReadAllLines(filePath);
+            if (lines.Length == 0)
+            {
+                Console.WriteLine("Database file is empty.");
+                return;
+            }
+
+            Console.WriteLine("\n Loading File : \n");
+            foreach (string line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line)) continue;
+
+                Console.WriteLine(line);
+                int separatorIndex = line.IndexOf('&');
+
+                if (separatorIndex == -1 || separatorIndex == line.Length - 1)
+                {
+                    Console.WriteLine("Invalid line format (missing or trailing '&'): " + line);
+                    continue;
+                }
+
+                string name = line.Substring(0, separatorIndex).Trim();
+                string path = line.Substring(separatorIndex + 1).Trim();
+
+                if (string.IsNullOrEmpty(path))
+                {
+                    Console.WriteLine("Path is empty for: " + name);
+                    continue;
+                }
+
+                if (!File.Exists(path))
+                {
+                    Console.WriteLine($"File does not exist at path: {path}");
+                    continue;
+                }
+
+                AudioSignal signal = AudioOperations.OpenAudioFile(path);
+                signal = AudioOperations.RemoveSilence(signal);
+                Algorithms.enroll(name, signal);
+            }
+        }
 
 
-     }
+    }
 }

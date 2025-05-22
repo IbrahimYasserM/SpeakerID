@@ -2,11 +2,14 @@
 using Recorder.MFCC;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace Recorder
@@ -41,7 +44,7 @@ namespace Recorder
                             d7 * d7 + d8 * d8 + d9 * d9 + d10 * d10 + d11 * d11 + d12 * d12);
         }
 
-        
+        // Extremely optimized standard DTW
         public static double dynamicTimeWarping(Sequence A, Sequence B)
         {
             n = A.Frames.Length;
@@ -50,7 +53,7 @@ namespace Recorder
             if (n == 0 || m == 0) return double.PositiveInfinity;
             if (n == 1 && m == 1) return getuEuclideanDistance(A.Frames[0].Features, B.Frames[0].Features);
 
-            
+
 
 
             for (int j = 0; j <= m; j++) prev[j] = double.PositiveInfinity;
@@ -60,14 +63,14 @@ namespace Recorder
             {
                 curr[0] = double.PositiveInfinity;
                 double[] aFeatures = A.Frames[i - 1].Features;
-                
+
                 for (int j = 1; j <= m; j++)
                 {
                     cost = getuEuclideanDistance(aFeatures, B.Frames[j - 1].Features);
 
-                    double min = prev[j - 1]; 
-                    if (prev[j] < min) min = prev[j]; 
-                    if (j >= 2 && prev[j - 2] < min) min = prev[j - 2]; 
+                    double min = prev[j - 1];
+                    if (prev[j] < min) min = prev[j];
+                    if (j >= 2 && prev[j - 2] < min) min = prev[j - 2];
 
                     curr[j] = cost + min;
                 }
@@ -89,7 +92,7 @@ namespace Recorder
             for (int j = 0; j <= m; j++) prev[j] = double.PositiveInfinity;
             prev[0] = 0;
 
-            int window = Math.Max(W, Math.Abs(n - m));  
+            int window = Math.Max(W, Math.Abs(n - m));
 
             for (int i = 1; i <= n; i++)
             {
@@ -104,8 +107,8 @@ namespace Recorder
                 {
                     double cost = getuEuclideanDistance(aFeatures, B.Frames[j - 1].Features);
 
-                    double min = prev[j - 1]; 
-                    if (prev[j] < min) min = prev[j]; 
+                    double min = prev[j - 1];
+                    if (prev[j] < min) min = prev[j];
                     if (j >= 2 && prev[j - 2] < min) min = prev[j - 2];
 
                     curr[j] = cost + min;
@@ -119,30 +122,55 @@ namespace Recorder
             return prev[m];
         }
 
-
         private static Dictionary<string, List<Sequence>> dataset = new Dictionary<string, List<Sequence>>();
         public static void enroll(string name, AudioSignal record) // Ebrahim & Adham
         {
-            Sequence sequence = AudioOperations.ExtractFeatures(AudioOperations.RemoveSilence(record));
+            string path = MainForm.AudioPath;
+            string filePath = "AudioPaths.txt";
+            if (path != null)
+            {
+                using (StreamWriter writer = new StreamWriter(filePath, append: true))
+                {
+                    writer.WriteLine(name + "&" + path);
+                }
+            }
+            record = AudioOperations.RemoveSilence(record);
+            Sequence sequence = AudioOperations.ExtractFeatures(record);
+            if (!dataset.ContainsKey(name))
+                dataset.Add(name, new List<Sequence>());
             dataset[name].Add(sequence);
         }
 
-        public static string identify(Sequence A) // Ibrahim & Zamel
+        public struct BestSequence
         {
-            String ans = null;
+            public string name;
+            public double distance;
+            public BestSequence(string name, double distance)
+            {
+                this.name = name;
+                this.distance = distance;
+            }
+        }
+        public static BestSequence identify(AudioSignal signal, bool removeSilence, int W = -1) // Ibrahim & Zamel
+        {
+            if (removeSilence)
+                signal = AudioOperations.RemoveSilence(signal);
+
+            Sequence A = AudioOperations.ExtractFeatures(signal);
+            String name = null;
             double mn = double.MaxValue;
             // loop over dataset and minimize the distance
             foreach (var user in dataset)
                 foreach (var sequence in user.Value)
                 {
-                    double distance = dynamicTimeWarping(A, sequence);
+                    double distance = W == -1 ? dynamicTimeWarping(A, sequence) : dynamicTimeWarpingWithPruning(A, sequence, W);
                     if (distance < mn)
                     {
                         mn = distance;
-                        ans = user.Key;
+                        name = user.Key;
                     }
                 }
-            return ans;
+            return new BestSequence(name, mn);
         }
 
     }
