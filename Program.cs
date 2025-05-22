@@ -14,10 +14,12 @@ namespace Recorder
        
         static void TestCasesProgram()
         {
-            // min , WithSilence, Pruning Width
-            //TestCasesRunner.runSample(1, true, 333);
-            // Case , Pruning Width
-            TestCasesRunner.runTestCase(1,23);
+            // min , WithSilence, Pruning 
+            TestCasesRunner.PruningTest(1, true, 333);
+            TestCasesRunner.PruningTest(4, true, 1111);
+
+            //Case , Pruning Width
+            TestCasesRunner.completeCases(1,23);
         }
         static void MainProgramProgram()
         {
