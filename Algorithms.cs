@@ -41,7 +41,7 @@ namespace Recorder
                             d7 * d7 + d8 * d8 + d9 * d9 + d10 * d10 + d11 * d11 + d12 * d12);
         }
 
-        // Extremely optimized standard DTW
+        
         public static double dynamicTimeWarping(Sequence A, Sequence B)
         {
             n = A.Frames.Length;

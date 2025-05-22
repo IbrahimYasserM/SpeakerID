@@ -15,9 +15,11 @@ namespace Recorder
         static void TestCasesProgram()
         {
             // min , WithSilence, Pruning 
-            TestCasesRunner.PruningTest(1, true, 333);
-            TestCasesRunner.PruningTest(4, true, 1111);
-
+            //TestCasesRunner.PruningTest(1, true, 333);
+            //TestCasesRunner.PruningTest(4, true, 1111);
+            //var input = AudioOperations.OpenAudioFile("SAMPLE\\Input sample\\ItIsPlausible_Rich_US_English.wav");
+            //var seq = AudioOperations.ExtractFeatures(input);
+            //TestCasesRunner.testTrain(seq);
             //Case , Pruning Width
             TestCasesRunner.completeCases(1,23);
         }

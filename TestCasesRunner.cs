@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Recorder.MFCC;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using static System.Net.Mime.MediaTypeNames;
@@ -9,7 +11,16 @@ namespace Recorder
 {
     static class TestCasesRunner
     {
-
+        struct per
+        {
+            public string Name;
+            public Sequence seq;
+            public per(string n ,  Sequence s)
+            {
+                Name = n;
+                seq = s;
+            }
+        }
         // minutes  , WithSilence, W
         public static void PruningTest(int min,bool silence, int W) {
             Console.WriteLine("\nRunning The "+ min + " - min Test: ");
@@ -81,6 +92,15 @@ namespace Recorder
 
             Console.WriteLine("Load & Extract TrainingSet: " + ((trainTime.ElapsedMilliseconds) / 1000.0) / 60.0);
             Console.WriteLine("Test Info: ");
+
+            Console.WriteLine("--------------------------------");
+            Stopwatch enhancedDTW = new Stopwatch();
+            enhancedDTW.Start();
+            var enhancedR = TestController.syncMatching(trainExtracted,testExtracted);
+            enhancedDTW.Stop();
+            Console.WriteLine("Enhanced DTW Accuracy: " + enhancedR);
+            Console.WriteLine("Enhanced DTW Time: " + (enhancedDTW.ElapsedMilliseconds / 1000.0f) / 60.0);
+            
             Stopwatch matchTime = new Stopwatch();
             matchTime.Start();
             var result = TestController.matching(trainExtracted, testExtracted);
@@ -102,7 +122,37 @@ namespace Recorder
             Console.WriteLine("------------------------------");
         }
 
-        
+        private static List<per> loadTrainTEst()
+        {
+            List<per> result = new List<per>();
+            string path = "SAMPLE\\Training set\\";
+           result.Add(new per("conspiracy_Crystal_US_English" , AudioOperations.ExtractFeatures(AudioOperations.OpenAudioFile(path + "conspiracy_Crystal_US_English.wav"))));
+           result.Add(new per("conspiracy_Mike_US_English", AudioOperations.ExtractFeatures(AudioOperations.OpenAudioFile(path + "conspiracy_Mike_US_English.wav"))));
+           result.Add(new per("conspiracy_Rich_US_English", AudioOperations.ExtractFeatures(AudioOperations.OpenAudioFile(path + "conspiracy_Rich_US_English.wav"))));
+           result.Add(new per("plausible_Crystal_US_English", AudioOperations.ExtractFeatures(AudioOperations.OpenAudioFile(path + "plausible_Crystal_US_English.wav"))));
+           result.Add(new per("plausible_Mike_US_English", AudioOperations.ExtractFeatures(AudioOperations.OpenAudioFile(path + "plausible_Mike_US_English.wav"))));
+           result.Add(new per("plausible_Rich_US_English", AudioOperations.ExtractFeatures(AudioOperations.OpenAudioFile(path + "plausible_Rich_US_English.wav"))));
+            return result;
+        } 
+
+        public static void testTrain(Sequence q)
+        {
+            var train = loadTrainTEst(); 
+            double dis = double.PositiveInfinity;
+            string name = "";
+            List<Sequence> rr = new List<Sequence>();
+            for (int i = 0; i < train.Count; i++) {
+                rr.Add(train[i].seq);
+            }
+                var cost = bonus.syncDTW(q, rr);
+                
+            
+
+            Console.WriteLine("Matched With: " + cost.ind);
+            Console.WriteLine("With Distance: " + cost.dist);
+            Console.WriteLine("------------------------");
+        }
+
 
     }
 }

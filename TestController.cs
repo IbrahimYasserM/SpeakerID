@@ -98,19 +98,13 @@ namespace Recorder
                 sum+= testingSet[i].userTemplates.Count;
                 foreach (var sequence in testingSet[i].userTemplates)
                 {
+                    //Console.WriteLine("started :");
                     double minDistance = double.MaxValue;
-                    string minUser = null;
-                    for (int j = 0; j < trainingSet.Count; j++)
-                    {
-                        var dis = bonus.syncDTW(sequence, trainingSet[i].userTemplates);
-                        if(dis.dist < minDistance)
-                        {
-                            minDistance = dis.dist;
-                            minUser = trainingSet[j].userName;
-                        }
-                    }
+                    string minUser = bonus.syncDTWCaller(trainingSet, sequence);
+                    
                     if (minUser == testingSet[i].userName)
                         cnt++;
+                    //Console.WriteLine(testingSet[i].userName + " " + minUser);
                 }
             }
             return (cnt/sum)*100.0f;
