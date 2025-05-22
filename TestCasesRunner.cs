@@ -49,12 +49,20 @@ namespace Recorder
             double dtwDis = Algorithms.dynamicTimeWarping(inputseq, tempseq); 
             dtwTime.Stop();
 
+            Stopwatch dtwBtime = new Stopwatch();
+            dtwBtime.Start();
+            double dtwBS = BeamSearch.BeamSearchDTW(inputseq, tempseq, 5000);
+            dtwBtime.Stop();
+
 
             Console.WriteLine("Distance With DTW: " + Math.Round(dtwDis,2));
             Console.WriteLine("Time For DTW Without Pruning: " + dtwTime.ElapsedMilliseconds);
             Console.WriteLine("--------------------------------");
             Console.WriteLine("Distance With DTW + Pruning: " + Math.Round(dtwPDis, 2));
             Console.WriteLine("Time For DTW With Pruning: " + dtwPtime.ElapsedMilliseconds);
+            Console.WriteLine("--------------------------------");
+            Console.WriteLine("Distance With DTW + Beam Search: " + Math.Round(dtwBS, 2));
+            Console.WriteLine("Time For DTW With Beam Search: " + dtwBtime.ElapsedMilliseconds);
             Console.WriteLine("--------------------------------");
 
         }

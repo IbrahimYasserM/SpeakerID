@@ -16,8 +16,7 @@ namespace Recorder
         private static MainForm mainForm = null;
         private static void TestCasesProgram()
         {
-            //TestCasesRunner.runSample(1, true, 333);
-            //TestCasesRunner.runTestCase1(23);
+            TestCasesRunner.PruningTest(4, true, 0);
         }
         private static AudioSignal inputAdioSignal()
         {
