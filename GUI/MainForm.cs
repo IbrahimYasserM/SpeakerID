@@ -8,6 +8,7 @@ using Accord.DirectSound;
 using Accord.Audio.Filters;
 using Recorder.Recorder;
 using Recorder.MFCC;
+using System.Collections.Generic;
 
 namespace Recorder
 {
@@ -25,8 +26,9 @@ namespace Recorder
         /// </summary>
         private AudioSignal signal = null, savedSignal = null;
         Sequence seq = null;
-       
+        List<AudioSignal> signals = new List<AudioSignal>();
         private string path;
+        public static string AudioPath;
 
         private Encoder encoder;
         private Decoder decoder;
@@ -286,15 +288,23 @@ namespace Recorder
             {
                 isRecorded = false;
                 path = open.FileName;
+                AudioPath = path;
                 //Open the selected audio file
                 signal = AudioOperations.OpenAudioFile(path);
+
+                Console.WriteLine(path);
+
+
+
                 signal = AudioOperations.RemoveSilence(signal);
-                 seq = AudioOperations.ExtractFeatures(signal);
+                seq = AudioOperations.ExtractFeatures(signal);
+                
+                
+                
                 for (int i = 0; i < seq.Frames.Length; i++)
                 {
                     for (int j = 0; j < 13; j++)
                     {
-
                         if (double.IsNaN(seq.Frames[i].Features[j]) || double.IsInfinity(seq.Frames[i].Features[j]))
                             throw new Exception("NaN");
                     }
@@ -322,9 +332,58 @@ namespace Recorder
 
         }
 
+        public void loadFromDatabase()
+        {
+            string filePath = "AudioPaths.txt";
+            // Check if the AudioPaths.txt file exists
+            if (!File.Exists(filePath)) {
+                Console.WriteLine($"Database file '{filePath}' not found.");
+                return;
+            }
 
-        
+            string[] lines = File.ReadAllLines(filePath);
+            if (lines.Length == 0)
+                return;
+
+            foreach (string line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line)) continue;
+
+                Console.WriteLine(line);
+                int separatorIndex = line.IndexOf('&');
+
+                if (separatorIndex == -1 || separatorIndex == line.Length - 1)
+                {
+                    Console.WriteLine("Invalid line format (missing or trailing '&'): " + line);
+                    continue;
+                }
+
+                string name = line.Substring(0, separatorIndex).Trim();
+                string path = line.Substring(separatorIndex + 1).Trim();
+
+                if (string.IsNullOrEmpty(path))
+                {
+                    Console.WriteLine("Path is empty for: " + name);
+                    continue;
+                }
+
+                if (!File.Exists(path))
+                {
+                    Console.WriteLine($"File does not exist at path: {path}");
+                    continue;
+                }
+
+              
+                AudioSignal signal = AudioOperations.OpenAudioFile(path);
+                signal = AudioOperations.RemoveSilence(signal);
+                Algorithms.enroll(name, signal);   
+            }
+        }
 
 
-     }
+
+
+
+
+    }
 }

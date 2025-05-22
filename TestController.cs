@@ -63,7 +63,7 @@ namespace Recorder
             return (cnt / sum) * 100.0f;
         }
         //Training set , Testing set
-        public static  double matching(List<user>trainingSet , List<user> testingSet)
+        public static double matching(List<user>trainingSet , List<user> testingSet)
         {    
             double sum=0, cnt = 0;
             for (int i = 0; i < testingSet.Count; i++)

@@ -2,7 +2,9 @@
 using Recorder.MFCC;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -111,6 +113,16 @@ namespace Recorder
         private static SortedDictionary<string, List<Sequence>> dataset = new SortedDictionary<string, List<Sequence>>();
         public static void enroll(string name, AudioSignal record) // Ebrahim & Adham
         {
+            string path = MainForm.AudioPath;
+            string filePath = "AudioPaths.txt";
+            if(path != null)
+            {
+                using (StreamWriter writer = new StreamWriter(filePath, append: true))
+                {
+                    writer.WriteLine(name + "&" + path);
+                }
+
+            }
             Sequence sequence = AudioOperations.ExtractFeatures(AudioOperations.RemoveSilence(record));
             if (!dataset.ContainsKey(name))
                 dataset.Add(name, new List<Sequence>());

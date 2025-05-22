@@ -34,15 +34,18 @@ namespace Recorder
                 SetProcessDPIAware();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            
             mainForm = new MainForm();
+            mainForm.loadFromDatabase();
             while (true)
             {
-                Console.WriteLine("Do you want to add a new audio into the database(A) or identify an audio(I) or any other key to exit");
+                Console.WriteLine("\nDo you want to add a new audio into the database(A) or identify an audio(I) or any other key to exit");
                 char choice = Console.ReadKey().KeyChar;
                 if (choice == 'A' || choice == 'a')
                 {
-                    Console.WriteLine("Enter your name");
+                    Console.WriteLine("\nEnter your name");
                     string name = Console.ReadLine();
+
                     Algorithms.enroll(name, inputAdioSignal());
                 }
                 else if (choice == 'I' || choice == 'i')
@@ -50,11 +53,11 @@ namespace Recorder
                     int W = -1;
                     while (true)
                     {
-                        Console.WriteLine("Wich algorithm do you prune search in the mating algorith? (Y/N)");
+                        Console.WriteLine("\nDo you want to prune search in the matching algorithm? (Y/N)");
                         char choice2 = Console.ReadKey().KeyChar;
                         if(choice2 == 'Y' || choice2 == 'y')
                         {
-                            Console.WriteLine("Enter the value for your prune");
+                            Console.WriteLine("\nEnter the value for your prune");
                             W = Convert.ToInt32(Console.ReadLine());
                             break;
                         }
@@ -62,7 +65,7 @@ namespace Recorder
                             break;
                     }
                     Algorithms.BestSequence best = Algorithms.identify(inputAdioSignal(), W);
-                    Console.WriteLine("You are matched with " + best.name + " with cost " + best.distance);
+                    Console.WriteLine("\nYou are matched with " + best.name + " with cost " + best.distance);
                 }
                 else
                     break;
