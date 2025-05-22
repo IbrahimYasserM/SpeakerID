@@ -141,9 +141,9 @@ namespace Recorder
                 {
                     writer.WriteLine(name + "&" + path);
                 }
-
             }
-            Sequence sequence = AudioOperations.ExtractFeatures(AudioOperations.RemoveSilence(record));
+            record = AudioOperations.RemoveSilence(record);
+            Sequence sequence = AudioOperations.ExtractFeatures(record);
             if (!dataset.ContainsKey(name))
                 dataset.Add(name, new List<Sequence>());
             dataset[name].Add(sequence);
@@ -159,9 +159,12 @@ namespace Recorder
                 this.distance = distance;
             }
         }
-        public static BestSequence identify(AudioSignal signal, int W = -1) // Ibrahim & Zamel
+        public static BestSequence identify(AudioSignal signal, bool removeSilence , int W = -1) // Ibrahim & Zamel
         {
-            Sequence A = AudioOperations.ExtractFeatures(AudioOperations.RemoveSilence(signal));
+            if(removeSilence)
+                signal = AudioOperations.RemoveSilence(signal);
+
+            Sequence A = AudioOperations.ExtractFeatures(signal);
             String name = null;
             double mn = double.MaxValue;
             // loop over dataset and minimize the distance

@@ -3,6 +3,7 @@ using Accord.Audio.Formats;
 using Recorder.MFCC;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -55,6 +56,23 @@ namespace Recorder
         public static Sequence ExtractFeatures(AudioSignal signal)
         {
             return MFCC.MFCC.ExtractFeatures(signal.data, signal.sampleRate);
+        }
+        public static AudioSignal OpenAudioStream(Stream stream)
+        {
+            WaveDecoder decoder = new WaveDecoder(stream);
+
+            Signal decodedSignal = decoder.Decode();
+
+            // Copy sample data from Accord Signal to your AudioSignal class
+            double[] data = new double[decodedSignal.Length];
+            decodedSignal.CopyTo(data); // Copy float samples as double
+
+            AudioSignal audioSignal = new AudioSignal();
+            audioSignal.data = data;
+            audioSignal.sampleRate = decoder.SampleRate;
+            audioSignal.signalLengthInMilliSec = decoder.Duration;
+
+            return audioSignal; 
         }
     }
 }

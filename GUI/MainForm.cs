@@ -319,8 +319,8 @@ namespace Recorder
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
-        {
-            savedSignal = signal;
+        { 
+           savedSignal = signal;
         }
 
         private void loadTrain1ToolStripMenuItem_Click(object sender, EventArgs e)

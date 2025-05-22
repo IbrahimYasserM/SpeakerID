@@ -12,6 +12,7 @@ namespace Recorder
 {
     static class Program
     {
+        public static string curName = null;
         private static MainForm mainForm = null;
         private static void TestCasesProgram()
         {
@@ -45,14 +46,24 @@ namespace Recorder
                 {
                     Console.WriteLine("\nEnter your name");
                     string name = Console.ReadLine();
+                    curName = name;
 
                     Algorithms.enroll(name, inputAdioSignal());
                 }
                 else if (choice == 'I' || choice == 'i')
                 {
                     int W = -1;
+                    bool removeSilence = false;
                     while (true)
                     {
+                        Console.WriteLine("\nDo you want to remove silence from your audio file ?  (Y/N) \n");
+                        char choice3 = Console.ReadKey().KeyChar;
+                        if (choice3 == 'Y' || choice3 == 'y')
+                            removeSilence = true;
+                        else if (choice3 == 'N' || choice3 == 'n')
+                            removeSilence = false;
+
+
                         Console.WriteLine("\nDo you want to prune search in the matching algorithm? (Y/N)");
                         char choice2 = Console.ReadKey().KeyChar;
                         if (choice2 == 'Y' || choice2 == 'y')
@@ -60,11 +71,15 @@ namespace Recorder
                             Console.WriteLine("\nEnter the value for your prune");
                             W = Convert.ToInt32(Console.ReadLine());
                             break;
+
                         }
                         else if (choice2 == 'N' || choice2 == 'n')
                             break;
+
+
+
                     }
-                    Algorithms.BestSequence best = Algorithms.identify(inputAdioSignal(), W);
+                    Algorithms.BestSequence best = Algorithms.identify(inputAdioSignal(),removeSilence, W);
                     Console.WriteLine("\nYou are matched with " + best.name + " with cost " + best.distance);
                 }
                 else
