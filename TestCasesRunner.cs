@@ -93,13 +93,13 @@ namespace Recorder
             Console.WriteLine("Load & Extract TrainingSet: " + ((trainTime.ElapsedMilliseconds) / 1000.0) / 60.0);
             Console.WriteLine("Test Info: ");
 
-            Console.WriteLine("--------------------------------");
-            Stopwatch enhancedDTW = new Stopwatch();
-            enhancedDTW.Start();
-            var enhancedR = TestController.syncMatching(trainExtracted,testExtracted);
-            enhancedDTW.Stop();
-            Console.WriteLine("Enhanced DTW Accuracy: " + enhancedR);
-            Console.WriteLine("Enhanced DTW Time: " + (enhancedDTW.ElapsedMilliseconds / 1000.0f) / 60.0);
+            //Console.WriteLine("--------------------------------");
+            //Stopwatch enhancedDTW = new Stopwatch();
+            //enhancedDTW.Start();
+            //var enhancedR = TestController.syncMatching(trainExtracted,testExtracted);
+            //enhancedDTW.Stop();
+            //Console.WriteLine("Enhanced DTW Accuracy: " + enhancedR);
+            //Console.WriteLine("Enhanced DTW Time: " + (enhancedDTW.ElapsedMilliseconds / 1000.0f) / 60.0);
             
             Stopwatch matchTime = new Stopwatch();
             matchTime.Start();
@@ -135,21 +135,34 @@ namespace Recorder
             return result;
         } 
 
-        public static void testTrain(Sequence q)
+        public static void testTrain(Sequence q,int W = -1)
         {
             var train = loadTrainTEst(); 
             double dis = double.PositiveInfinity;
             string name = "";
-            List<Sequence> rr = new List<Sequence>();
             for (int i = 0; i < train.Count; i++) {
-                rr.Add(train[i].seq);
+                double cost;
+                if (W == -1)
+                    cost = Algorithms.dynamicTimeWarping(q, train[i].seq);
+                else
+                    cost = Algorithms.dynamicTimeWarpingWithPruning(q, train[i].seq, W);
+                if(cost< dis)
+                {
+                    name = train[i].Name;
+                    dis = cost;
+                }
             }
-                var cost = bonus.syncDTW(q, rr);
-                
-            
+            //Console.WriteLine("------------------");
+            //Console.WriteLine("Semi Optmized: ");
+            List<Sequence> sequences = new List<Sequence>();
+            for (int i = 0; i < train.Count; i++) sequences.Add(train[i].seq);
+            Pair p = bonus.syncDTW(q, sequences);
 
-            Console.WriteLine("Matched With: " + cost.ind);
-            Console.WriteLine("With Distance: " + cost.dist);
+
+
+            Console.WriteLine("------------------------");
+            Console.WriteLine("Matched With: " + train[p.ind].Name);
+            Console.WriteLine("With Distance: " + p.dist);
             Console.WriteLine("------------------------");
         }
 

@@ -16,8 +16,47 @@ namespace Recorder
         private static MainForm mainForm = null;
         private static void TestCasesProgram()
         {
-            //TestCasesRunner.runSample(1, true, 333);
-            //TestCasesRunner.runTestCase1(23);
+            while (true)
+            {
+                Console.WriteLine("For Sample type 1: ");
+                Console.WriteLine("For Complete type 2: ");
+                int choice = int.Parse(Console.ReadLine());
+                if (choice == 1)
+                {
+                    Console.Write("Pruning Test: 1, ");
+                    Console.WriteLine("Input VS Template: 2 ");
+                    int choice2 = int.Parse(Console.ReadLine());
+                    if (choice2 == 1)
+                    {
+                        Console.WriteLine("Enter The Mins: ");
+                        int min = int.Parse(Console.ReadLine());
+                        Console.WriteLine("With Silence (Y/N): ");
+                        string x = Console.ReadLine();
+                        bool silence = false;
+                        if (x == "Y") silence = true;
+                        Console.WriteLine("Enter The Pruning Width: ");
+                        int W = int.Parse(Console.ReadLine());
+                        TestCasesRunner.PruningTest(min, silence, W);
+                    }
+                    else
+                    {
+                        var seq = AudioOperations.OpenAudioFile("SAMPLE\\Input sample\\ItIsPlausible_Rich_US_English.wav");
+                        Console.WriteLine("Enter The Pruning Width (if u want without type -1):  ");
+                        int W = int.Parse(Console.ReadLine());
+                        var input = AudioOperations.ExtractFeatures(seq);
+                        TestCasesRunner.testTrain(input, W);
+
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Which Tese ? : 1 , 2 , 3  ");
+                    int test = int.Parse(Console.ReadLine());
+                    Console.WriteLine("Enter Pruning Width: ");
+                    int W = int.Parse(Console.ReadLine());
+                    TestCasesRunner.completeCases(test, W);
+                }
+            }
         }
         private static AudioSignal inputAdioSignal()
         {
