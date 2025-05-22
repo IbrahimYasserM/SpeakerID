@@ -33,64 +33,63 @@ namespace Recorder
         }
         //Training set , Testing set, W
 
-        public static  double matchingWithPruning(List<user>trainingSet , List<user> testingSet,int W)
+        public static double matching(List<user> trainingSet, List<user> testingSet,int W = -1)
         {
-            double sum=0 , cnt = 0;
+            double sum = 0, cnt = 0;
+
+            // Pre-compute training set size
+            int trainingSetCount = trainingSet.Count;
+
+            // Process each user in testing set
             for (int i = 0; i < testingSet.Count; i++)
             {
-                sum += testingSet[i].userTemplates.Count;
-                foreach (var sequence in testingSet[i].userTemplates)
+                var testUser = testingSet[i];
+                int testTemplatesCount = testUser.userTemplates.Count;
+                sum += testTemplatesCount;
+
+                // Process each sequence in the current user's templates
+                for (int k = 0; k < testTemplatesCount; k++)
                 {
+                    var sequence = testUser.userTemplates[k];
                     double minDistance = double.MaxValue;
                     string minUser = null;
-                    for (int j = 0; j < trainingSet.Count; j++)
+
+                    // Compare with each user in training set
+                    for (int j = 0; j < trainingSetCount; j++)
                     {
-                        foreach (var temp in trainingSet[j].userTemplates)
+                        var trainUser = trainingSet[j];
+                        int trainTemplatesCount = trainUser.userTemplates.Count;
+
+                        // Compare with each template of current training user
+                        for (int t = 0; t < trainTemplatesCount; t++)
                         {
-                            double dis = Algorithms.dynamicTimeWarpingWithPruning(sequence, temp, W);
+                            var temp = trainUser.userTemplates[t];
+                            double dis = 0;
+                            if (W == -1)
+                                dis = Algorithms.dynamicTimeWarping(sequence, temp);
+                            else
+                             dis = Algorithms.dynamicTimeWarpingWithPruning(sequence, temp, W);
+
+                            // Update minimum if needed
                             if (dis < minDistance)
                             {
                                 minDistance = dis;
-                                minUser = trainingSet[j].userName;
+                                minUser = trainUser.userName;
                             }
                         }
                     }
-                    if (minUser == testingSet[i].userName)
+
+                    // Count correct matches
+                    if (minUser == testUser.userName)
                         cnt++;
                 }
             }
 
-            return (cnt / sum) * 100.0f;
+            // Calculate percentage
+            return (cnt / sum) * 100.0;
         }
-        //Training set , Testing set
-        public static  double matching(List<user>trainingSet , List<user> testingSet)
-        {    
-            double sum=0, cnt = 0;
-            for (int i = 0; i < testingSet.Count; i++)
-            {
-                sum+= testingSet[i].userTemplates.Count;
-                foreach (var sequence in testingSet[i].userTemplates)
-                {
-                    double minDistance = double.MaxValue;
-                    string minUser = null;
-                    for (int j = 0; j < trainingSet.Count; j++)
-                    {
-                        foreach (var temp in trainingSet[j].userTemplates)
-                        {
-                            double dis = Algorithms.dynamicTimeWarping(sequence, temp);
-                            if (dis < minDistance)
-                            {
-                                minDistance = dis;
-                                minUser = trainingSet[j].userName;
-                            }
-                        }
-                    }
-                    if (minUser == testingSet[i].userName)
-                        cnt++;
-                }
-            }
-            return (cnt/sum)*100.0f;
-        }
+
+        
         public static  double syncMatching(List<user>trainingSet , List<user> testingSet)
         {    
             double sum=0, cnt = 0;

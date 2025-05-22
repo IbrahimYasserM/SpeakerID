@@ -289,7 +289,6 @@ namespace Recorder
                 isRecorded = false;
                 path = open.FileName;
                 AudioPath = path;
-                //Open the selected audio file
                 signal = AudioOperations.OpenAudioFile(path);
 
                 Console.WriteLine(path);
@@ -335,16 +334,21 @@ namespace Recorder
         public void loadFromDatabase()
         {
             string filePath = "AudioPaths.txt";
-            // Check if the AudioPaths.txt file exists
+
             if (!File.Exists(filePath))
             {
-                Console.WriteLine($"Database file '{filePath}' not found.");
-                return;
+                Console.WriteLine($"Database file '{filePath}' not found, Creating file instead.");
+                File.Create(filePath).Close();
+                return; 
             }
 
             string[] lines = File.ReadAllLines(filePath);
             if (lines.Length == 0)
+            {
+                Console.WriteLine("Database file is empty.");
                 return;
+            }
+
             Console.WriteLine("\n Loading File : \n");
             foreach (string line in lines)
             {
@@ -374,16 +378,11 @@ namespace Recorder
                     continue;
                 }
 
-
                 AudioSignal signal = AudioOperations.OpenAudioFile(path);
                 signal = AudioOperations.RemoveSilence(signal);
                 Algorithms.enroll(name, signal);
             }
         }
-
-
-
-
 
 
     }
